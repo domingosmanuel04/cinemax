@@ -1,0 +1,6 @@
+node_modules
+.next
+.git
+prisma/dev.db
+*.md
+agent-transcripts
