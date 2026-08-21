@@ -25,7 +25,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   }
   return (
     <>
-      <Navbar dict={dict} userName={session?.name} locale={locale} cinemaName={cinemaName} currency={currency} />
       <main>{children}</main>
       <Footer dict={dict} />
     </>

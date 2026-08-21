@@ -18,21 +18,21 @@ export async function loginAction(
 ) {
   if (formData.get("otp")) {
     const otp = String(formData.get("otp") || "");
-    const next = String(formData.get("next") || "/conta");
+    const next = String(formData.get("next") || "/");
     const user = await completeTwoFactorLogin(otp);
     if (!user) return { error: "Código 2FA inválido.", requires2fa: true };
-    redirect(next.startsWith("/") ? next : "/conta");
+    redirect(next.startsWith("/") ? next : "/");
   }
   const parsed = creds.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
-    next: formData.get("next") || "/conta",
+    next: formData.get("next") || "/",
   });
   if (!parsed.success) return { error: "Dados inválidos." };
   const user = await loginWithCredentials(parsed.data.email, parsed.data.password);
   if (!user) return { error: "Email ou palavra-passe incorrectos." };
   if ("requires2fa" in user && user.requires2fa) return { requires2fa: true };
-  redirect(parsed.data.next?.startsWith("/") ? parsed.data.next : "/conta");
+  redirect(parsed.data.next?.startsWith("/") ? parsed.data.next : "/");
 }
 
 export async function registerAction(_: { error?: string } | null, formData: FormData) {
@@ -58,7 +58,7 @@ export async function registerAction(_: { error?: string } | null, formData: For
     },
   });
   await createSession({ id: user.id, email: user.email, name: user.name, role: user.role, avatarUrl: user.avatarUrl });
-  redirect("/conta");
+  redirect("/");
 }
 
 export async function logoutAction() {
