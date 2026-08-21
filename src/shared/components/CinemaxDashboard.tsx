@@ -27,22 +27,31 @@ import {
   Play,
   Plus,
   Star,
+  Flame,
+  Award,
+  Popcorn,
 } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
 import { LocaleSwitch } from "@/shared/components/LocaleSwitch";
 import { logoutAction } from "@/features/auth/actions";
 
-type MovieItem = {
+type MovieCardItem = {
   id: string;
+  slug?: string;
   title: string;
   genre: string;
   rating: string;
   posterUrl: string;
+  backdropUrl?: string;
+  releaseDate?: string;
+  duration?: string;
+  badge?: string;
 };
 
 type ArtistItem = {
   id: string;
   name: string;
+  role?: string;
   avatarUrl: string;
 };
 
@@ -51,92 +60,189 @@ type ContinueWatchingItem = {
   title: string;
   progress: string;
   imageUrl: string;
+  episode?: string;
+};
+
+type ProductItem = {
+  id: string;
+  name: string;
+  price: string;
+  imageUrl: string;
 };
 
 interface CinemaxDashboardProps {
   userName?: string | null;
   locale?: string;
   currency?: string;
-  popularMovies?: MovieItem[];
-  favoriteMovies?: MovieItem[];
+  popularMovies?: MovieCardItem[];
+  favoriteMovies?: MovieCardItem[];
+  releases?: MovieCardItem[];
+  comingSoon?: MovieCardItem[];
+  series?: MovieCardItem[];
   artists?: ArtistItem[];
   continueWatching?: ContinueWatchingItem[];
+  products?: ProductItem[];
 }
 
-const defaultPopular: MovieItem[] = [
+const defaultReleases: MovieCardItem[] = [
+  {
+    id: "r1",
+    slug: "dune-2",
+    title: "Dune: Part Two",
+    genre: "Sci-Fi · Aventura",
+    rating: "IMDb 8.6",
+    posterUrl: "/0030a0e8216496997f7abebc1b9f8837.jpg",
+    badge: "IMAX 3D",
+    releaseDate: "Em Exibição",
+  },
+  {
+    id: "r2",
+    slug: "avatar-3",
+    title: "Avatar: Fire & Ash",
+    genre: "Ação · Fantasia",
+    rating: "IMDb 8.4",
+    posterUrl: "/4d56548cd696aac3a0de41b63e15d535.jpg",
+    badge: "ESTREIA DA SEMANA",
+    releaseDate: "Sexta-feira",
+  },
+  {
+    id: "r3",
+    slug: "oppenheimer",
+    title: "Oppenheimer",
+    genre: "Biografia · Drama",
+    rating: "IMDb 8.9",
+    posterUrl: "/66bd9b1f8354a9aa6900dee35bc2a911.jpg",
+    badge: "Vencedor de Oscar",
+    releaseDate: "Em Exibição",
+  },
+  {
+    id: "r4",
+    slug: "spider-man",
+    title: "Spider-Man: Beyond Spider-Verse",
+    genre: "Animação · Ação",
+    rating: "IMDb 8.8",
+    posterUrl: "/fb40a0f422e55b5d0a4586abea633d28.jpg",
+    badge: "4DX ATMOS",
+    releaseDate: "Em Breve",
+  },
+];
+
+const defaultSeries: MovieCardItem[] = [
+  {
+    id: "s1",
+    slug: "the-last-of-us",
+    title: "The Last of Us: Temporada 2",
+    genre: "Drama · Sobrevivência",
+    rating: "IMDb 8.8",
+    posterUrl: "/movie-poster-design-template_841014-16989.avif",
+    badge: "CINEMAX+ ORIGINAL",
+    duration: "9 Episódios",
+  },
+  {
+    id: "s2",
+    slug: "house-of-dragon",
+    title: "House of the Dragon",
+    genre: "Fantasia · Ação",
+    rating: "IMDb 8.5",
+    posterUrl: "/modelo-de-design-de-poster-de-filme_841014-16988.avif",
+    badge: "TOP 1 ANGOLA",
+    duration: "10 Episódios",
+  },
+  {
+    id: "s3",
+    slug: "stranger-things",
+    title: "Stranger Things: Temporada Final",
+    genre: "Ficção · Terror",
+    rating: "IMDb 8.7",
+    posterUrl: "/cc02e351dccb005fe40e5b5d50ab2c55.jpg",
+    badge: "NOVA TEMPORADA",
+    duration: "8 Episódios",
+  },
+];
+
+const defaultPopular: MovieCardItem[] = [
   {
     id: "1",
-    title: "John Wick",
-    genre: "Action, Horror",
-    rating: "IMDb 7.4",
-    posterUrl: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80",
+    title: "John Wick: Capítulo 4",
+    genre: "Action, Crime",
+    rating: "IMDb 7.8",
+    posterUrl: "/OIP (7).webp",
   },
   {
     id: "2",
-    title: "Avatar: Way of Water",
+    title: "Avatar: O Caminho da Água",
     genre: "Sci-Fi, Adventure",
     rating: "IMDb 7.8",
-    posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&q=80",
+    posterUrl: "/OIP (8).webp",
   },
   {
     id: "3",
     title: "Interstellar",
     genre: "Sci-Fi, Drama",
     rating: "IMDb 8.6",
-    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80",
+    posterUrl: "/OIP (9).webp",
   },
 ];
 
-const defaultFavorites: MovieItem[] = [
+const defaultFavorites: MovieCardItem[] = [
   {
     id: "4",
-    title: "The Dark Knight",
+    title: "O Cavaleiro das Trevas",
     genre: "Action, Crime",
     rating: "IMDb 9.0",
-    posterUrl: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=300&q=80",
+    posterUrl: "/cb99b8b3aac2684d9260778c107071fd.jpg",
   },
   {
     id: "5",
     title: "Inception",
     genre: "Action, Sci-Fi",
     rating: "IMDb 8.8",
-    posterUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300&q=80",
+    posterUrl: "/0030a0e8216496997f7abebc1b9f8837.jpg",
   },
   {
     id: "6",
-    title: "Dune: Part Two",
-    genre: "Sci-Fi, Adventure",
-    rating: "IMDb 8.5",
-    posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80",
+    title: "Gladiador II",
+    genre: "Ação, História",
+    rating: "IMDb 8.2",
+    posterUrl: "/4d56548cd696aac3a0de41b63e15d535.jpg",
   },
 ];
 
 const defaultArtists: ArtistItem[] = [
-  { id: "a1", name: "Keanu Reeves", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80" },
-  { id: "a2", name: "Zendaya", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80" },
-  { id: "a3", name: "Timothée C.", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80" },
-  { id: "a4", name: "Florence P.", avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80" },
+  { id: "a1", name: "Keanu Reeves", role: "Ator Principal", avatarUrl: "/OIP.webp" },
+  { id: "a2", name: "Zendaya", role: "Protagonista", avatarUrl: "/OIP (1).webp" },
+  { id: "a3", name: "Timothée Chalamet", role: "Ator Principal", avatarUrl: "/OIP (2).webp" },
+  { id: "a4", name: "Florence Pugh", role: "Atriz Principal", avatarUrl: "/OIP (3).webp" },
 ];
 
 const defaultContinue: ContinueWatchingItem[] = [
   {
     id: "c1",
     title: "Stranger Things S4",
-    progress: "45m left",
-    imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80",
+    episode: "Episódio 7 · O Massacre no Laboratório",
+    progress: "Faltam 45m",
+    imageUrl: "/OIP (4).webp",
   },
   {
     id: "c2",
     title: "The Last of Us",
-    progress: "12m left",
-    imageUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&q=80",
+    episode: "Episódio 4 · Por Favor, Segura a Minha Mão",
+    progress: "Faltam 12m",
+    imageUrl: "/OIP (5).webp",
   },
   {
     id: "c3",
     title: "House of the Dragon",
-    progress: "28m left",
-    imageUrl: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500&q=80",
+    episode: "Episódio 10 · A Rainha Preta",
+    progress: "Faltam 28m",
+    imageUrl: "/OIP (6).webp",
   },
+];
+
+const defaultProducts: ProductItem[] = [
+  { id: "p1", name: "Combo Pipoca Grande + Bebida 1L", price: "4.500 Kz", imageUrl: "/OIP (8).webp" },
+  { id: "p2", name: "Óculos 3D CINEMAX RealD", price: "1.200 Kz", imageUrl: "/OIP (9).webp" },
+  { id: "p3", name: "Menu VIP Nachos + Molho Cheddar", price: "3.800 Kz", imageUrl: "/cb99b8b3aac2684d9260778c107071fd.jpg" },
 ];
 
 export function CinemaxDashboard({
@@ -145,23 +251,24 @@ export function CinemaxDashboard({
   currency = "AOA",
   popularMovies = defaultPopular,
   favoriteMovies = defaultFavorites,
+  releases = defaultReleases,
+  series = defaultSeries,
   artists = defaultArtists,
   continueWatching = defaultContinue,
+  products = defaultProducts,
 }: CinemaxDashboardProps) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<"TV Series" | "Movies" | "Animes">("Movies");
 
+  const activeReleases = releases && releases.length > 0 ? releases : defaultReleases;
+  const activeSeries = series && series.length > 0 ? series : defaultSeries;
+  const activePopular = popularMovies && popularMovies.length > 0 ? popularMovies : defaultPopular;
+  const activeFavorites = favoriteMovies && favoriteMovies.length > 0 ? favoriteMovies : defaultFavorites;
+  const activeArtists = artists && artists.length > 0 ? artists : defaultArtists;
+  const activeContinue = continueWatching && continueWatching.length > 0 ? continueWatching : defaultContinue;
+  const activeProducts = products && products.length > 0 ? products : defaultProducts;
+
   const menuSections = [
-    {
-      title: "Menu",
-      items: [
-        { label: "Home", href: "/", icon: Home },
-        { label: "Filmes", href: "/filmes", icon: Film },
-        { label: "Séries", href: "/series", icon: Tv },
-        { label: "Lançamentos", href: "/lancamentos", icon: Sparkles },
-        { label: "Estreias", href: "/estreias", icon: Calendar },
-      ],
-    },
     {
       title: "Explorar",
       items: [
@@ -200,13 +307,13 @@ export function CinemaxDashboard({
           {/* SIDEBAR ESQUERDA */}
           <aside className="relative flex h-full min-h-0 w-full flex-col overflow-hidden border-r border-white/10 bg-[#09090b]/80">
             {/* LOGO */}
-            <div className="mt-[35px] ml-[35px] mb-2 shrink-0">
+            <div className="mt-[45px] ml-[45px] mb-4 shrink-0">
               <Logo />
             </div>
 
             {/* CARTÃO DO UTILIZADOR LOGADO */}
             {userName ? (
-              <div className="mx-3 my-2 flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 p-2.5 shrink-0">
+              <div className="mx-3 mb-4 flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 p-2.5 shrink-0">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#e50914] font-bold text-xs text-white uppercase shadow">
                   {userName.charAt(0)}
                 </div>
@@ -217,8 +324,8 @@ export function CinemaxDashboard({
               </div>
             ) : null}
 
-            {/* MENU ESQUERDO ORGANIZADO E ROLÁVEL */}
-            <div className="flex flex-1 min-h-0 flex-col gap-4 overflow-y-auto px-3 pb-8">
+            {/* MENU ESQUERDO ORGANIZADO E ROLÁVEL (APENAS EXPLORAR, LOJA & GERAL) */}
+            <div className="mt-4 flex flex-1 min-h-0 flex-col gap-6 overflow-y-auto px-3 pb-8">
               {menuSections.map((section) => (
                 <div key={section.title}>
                   <p className="px-[20px] text-[10px] font-semibold tracking-[0.2em] text-white/40 uppercase">
@@ -267,36 +374,41 @@ export function CinemaxDashboard({
           </aside>
 
           {/* CONTEÚDO CENTRAL */}
-          <main className="flex h-full flex-col overflow-y-auto px-[44px] pt-[45px] pb-8 no-scrollbar">
+          <main className="flex h-full min-h-0 flex-col overflow-hidden">
             
-            {/* TOP NAVIGATION HEADER (TV Series, Movies, Animes + Right LocaleSwitch & Entrar / Minha Conta) */}
-            <div className="flex items-center justify-between gap-4">
-              <nav className="flex items-center gap-[24px]">
-                {(["TV Series", "Movies", "Animes"] as const).map((tab) => {
-                  const isSelected = activeTab === tab;
+            {/* TOP NAVIGATION HEADER (FIXO NO TOPO DO CONTEÚDO CENTRAL - NUNCA QUEBRA AO ROLAR) */}
+            <div className="shrink-0 z-20 px-[44px] py-4 bg-[#0d0e12] border-b border-white/10 flex items-center justify-between gap-4 shadow-md">
+              <nav className="flex items-center gap-6 overflow-x-auto no-scrollbar shrink">
+                {[
+                  { label: "Home", href: "/" },
+                  { label: "Filmes", href: "/filmes" },
+                  { label: "Séries", href: "/series" },
+                  { label: "Lançamentos", href: "/lancamentos" },
+                  { label: "Estreias", href: "/estreias" },
+                ].map((item) => {
+                  const isSelected = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
                   return (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setActiveTab(tab)}
-                      className={`text-sm font-semibold transition-all ${
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={`whitespace-nowrap shrink-0 text-xs md:text-sm font-semibold transition-all ${
                         isSelected
-                          ? "text-white border-b-2 border-[#e50914] pb-1"
-                          : "text-white/50 hover:text-white/80 pb-1"
+                          ? "text-[#e50914] border-b-2 border-[#e50914] pb-1 font-bold"
+                          : "text-white/60 hover:text-white pb-1"
                       }`}
                     >
-                      {tab}
-                    </button>
+                      {item.label}
+                    </Link>
                   );
                 })}
               </nav>
 
-              {/* LADO DIREITO DA NAVEGAÇÃO: IDIOMA E BOTÃO ENTRAR / MINHA CONTA COM ÍCONE */}
-              <div className="flex items-center gap-3">
+              {/* LADO DIREITO DA NAVEGAÇÃO */}
+              <div className="flex items-center gap-3 shrink-0">
                 <LocaleSwitch locale={locale} currency={currency} />
                 <Link
                   href={userName ? "/conta" : "/entrar"}
-                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20 hover:text-white"
+                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20 hover:text-white shrink-0"
                 >
                   {userName ? (
                     <User className="h-4 w-4 text-[#e50914]" />
@@ -308,49 +420,178 @@ export function CinemaxDashboard({
               </div>
             </div>
 
-            {/* HERO BANNER (Height: 270px, Border-radius: 20px) */}
+            {/* ÁREA DE CONTEÚDO ROLÁVEL ABAIXO DO HEADER FIXO */}
+            <div className="flex-1 min-h-0 overflow-y-auto px-[44px] pt-4 pb-8 no-scrollbar">
+
+              {/* HERO BANNER - CINEMAX EXPERIÊNCIA & DESTAQUE */}
             <div className="mt-[20px] relative h-[270px] w-full shrink-0 overflow-hidden rounded-[20px] shadow-xl group">
-              {/* Background Image */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1400&q=80"
-                alt="Jumanji"
+                src="/de48494bb12ff31cff7a404811c507dd.jpg"
+                alt="CINEMAX"
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#09090b]/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/50 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#09090b]/90 via-[#09090b]/40 to-transparent" />
 
-              {/* Text / Actions on Bottom Left */}
-              <div className="absolute bottom-6 left-6 z-10 flex flex-col items-start gap-2">
-                <h1 className="font-display text-4xl font-bold tracking-wider text-white drop-shadow-md">
-                  JUMANJI
+              <div className="absolute bottom-6 left-6 z-10 flex flex-col items-start gap-2 max-w-xl">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-[#e50914] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    CINEMAX REVOLUTION
+                  </span>
+                  <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                    IMAX 3D & 4DX
+                  </span>
+                </div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold tracking-wider text-white drop-shadow-md">
+                  JUMANJI: O PRÓXIMO NÍVEL
                 </h1>
-                <p className="text-xs font-medium tracking-wide text-white/70">
-                  ACTION, ADVENTURE, COMEDY &nbsp;·&nbsp; <span className="text-emerald-400 font-semibold">94% Match</span>
+                <p className="text-xs font-normal leading-relaxed text-white/80 line-clamp-2">
+                  Vivencie a experiência cinematográfica do CINEMAX: bilheteira online em tempo real, escolha de lugares VIP, som espacial Dolby Atmos e catálogo exclusivo CINEMAX+.
                 </p>
                 <div className="mt-2 flex items-center gap-3">
                   <Link
-                    href="/filmes/jumanji"
+                    href="/sessoes"
                     className="flex items-center gap-2 rounded-full bg-[#e50914] px-5 py-2 text-xs font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-red-700"
                   >
-                    <Play className="h-3.5 w-3.5 fill-white" /> Watch
+                    <Ticket className="h-3.5 w-3.5" /> Comprar Bilhete
                   </Link>
-                  <button
-                    type="button"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all hover:bg-white/20"
-                    aria-label="Add to list"
+                  <Link
+                    href="/filmes"
+                    className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-white/20"
                   >
-                    <Plus className="h-4 w-4" />
-                  </button>
+                    <Play className="h-3.5 w-3.5 fill-white" /> Ver Trailer
+                  </Link>
                 </div>
               </div>
             </div>
 
-            {/* BEST ARTISTS */}
-            <section className="mt-[38px] flex flex-col">
+            {/* SEÇÃO 1: NOVOS LANÇAMENTOS E ESTREIAS NO CINEMA */}
+            <section className="mt-[36px] flex flex-col">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold tracking-wide text-white">Best Artists</h2>
+                <div>
+                  <h2 className="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    <Flame className="h-4 w-4 text-[#e50914]" /> Novos Lançamentos & Estreias
+                  </h2>
+                  <p className="text-[11px] text-white/50">Os filmes mais aguardados nas nossas salas de cinema</p>
+                </div>
+                <Link href="/lancamentos" className="text-xs font-medium text-[#e50914] hover:underline flex items-center gap-1">
+                  Ver Todos <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* Grid de Cards de Lançamentos */}
+              <div className="mt-[16px] grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {activeReleases.slice(0, 4).map((movie, idx) => {
+                  const fallbackImgs = [
+                    "/0030a0e8216496997f7abebc1b9f8837.jpg",
+                    "/4d56548cd696aac3a0de41b63e15d535.jpg",
+                    "/66bd9b1f8354a9aa6900dee35bc2a911.jpg",
+                    "/fb40a0f422e55b5d0a4586abea633d28.jpg",
+                  ];
+                  const imgSrc = (movie.posterUrl && !movie.posterUrl.endsWith(".svg")) ? movie.posterUrl : fallbackImgs[idx % fallbackImgs.length];
+                  return (
+                    <Link
+                      key={movie.id}
+                      href={`/filmes/${movie.slug || movie.id}`}
+                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:border-white/20 hover:bg-white/10"
+                    >
+                      <div className="relative h-[180px] w-full overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imgSrc}
+                          alt={movie.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        {movie.badge ? (
+                          <span className="absolute top-2 left-2 rounded-md bg-[#e50914] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow">
+                            {movie.badge}
+                          </span>
+                        ) : null}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <span className="rounded-full bg-[#e50914] px-3 py-1.5 text-xs font-bold text-white shadow-lg flex items-center gap-1.5">
+                            <Ticket className="h-3.5 w-3.5" /> Bilhete
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col p-3">
+                        <span className="text-xs font-semibold text-white truncate">{movie.title}</span>
+                        <div className="mt-1 flex items-center justify-between text-[10px] text-white/50">
+                          <span>{movie.genre}</span>
+                          <span className="font-semibold text-amber-400">{movie.rating}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* SEÇÃO 2: SÉRIES & STREAMING EXCLUSIVO CINEMAX+ */}
+            <section className="mt-[36px] flex flex-col">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    <PlayCircle className="h-4 w-4 text-[#e50914]" /> Séries Em Destaque no CINEMAX+
+                  </h2>
+                  <p className="text-[11px] text-white/50">Assista onde quiser com a subscrição CINEMAX+</p>
+                </div>
+                <Link href="/series" className="text-xs font-medium text-[#e50914] hover:underline flex items-center gap-1">
+                  Explorar Séries <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* Cards de Séries com Imagens Locais */}
+              <div className="mt-[16px] grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {activeSeries.slice(0, 3).map((item, idx) => {
+                  const fallbackSeriesImgs = [
+                    "/movie-poster-design-template_841014-16989.avif",
+                    "/modelo-de-design-de-poster-de-filme_841014-16988.avif",
+                    "/cc02e351dccb005fe40e5b5d50ab2c55.jpg",
+                  ];
+                  const imgSrc = (item.posterUrl && !item.posterUrl.endsWith(".svg")) ? item.posterUrl : fallbackSeriesImgs[idx % fallbackSeriesImgs.length];
+                  return (
+                    <Link
+                      key={item.id}
+                      href={`/series`}
+                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:border-white/20 hover:bg-white/10"
+                    >
+                      <div className="relative h-[120px] w-full overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imgSrc}
+                          alt={item.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-transparent to-transparent" />
+                        {item.badge ? (
+                          <span className="absolute top-2 left-2 rounded-md bg-white/20 backdrop-blur-md border border-white/10 px-2 py-0.5 text-[9px] font-semibold text-white">
+                            {item.badge}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-col p-3">
+                        <span className="text-xs font-semibold text-white truncate">{item.title}</span>
+                        <div className="mt-1 flex items-center justify-between text-[10px] text-white/50">
+                          <span>{item.genre}</span>
+                          <span>{item.duration || "Nova Temporada"}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* SEÇÃO 3: BEST ARTISTS */}
+            <section className="mt-[36px] flex flex-col">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    <Award className="h-4 w-4 text-amber-400" /> Melhores Artistas & Elenco
+                  </h2>
+                  <p className="text-[11px] text-white/50">Estrelas do cinema em destaque nesta temporada</p>
+                </div>
                 <div className="flex items-center gap-2">
                   <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Previous artist">
                     <ChevronLeft className="h-4 w-4" />
@@ -361,31 +602,43 @@ export function CinemaxDashboard({
                 </div>
               </div>
 
-              {/* Cards horizontal single row */}
-              <div className="mt-[18px] flex gap-4 overflow-x-auto no-scrollbar pb-1">
-                {artists.map((artist) => (
-                  <div
-                    key={artist.id}
-                    className="flex w-[120px] shrink-0 flex-col items-center gap-2 rounded-2xl border border-white/5 bg-white/5 p-3 text-center transition-all hover:border-white/20 hover:bg-white/10"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={artist.avatarUrl}
-                      alt={artist.name}
-                      className="h-14 w-14 rounded-full object-cover shadow-md"
-                    />
-                    <span className="text-xs font-medium text-white/90 truncate w-full">
-                      {artist.name}
-                    </span>
-                  </div>
-                ))}
+              {/* Cards horizontal single row com Imagens Locais */}
+              <div className="mt-[16px] flex gap-4 overflow-x-auto no-scrollbar pb-1">
+                {activeArtists.map((artist, idx) => {
+                  const fallbackArtistImgs = ["/OIP.webp", "/OIP (1).webp", "/OIP (2).webp", "/OIP (3).webp"];
+                  const imgSrc = (artist.avatarUrl && !artist.avatarUrl.endsWith(".svg")) ? artist.avatarUrl : fallbackArtistImgs[idx % fallbackArtistImgs.length];
+                  return (
+                    <div
+                      key={artist.id}
+                      className="flex w-[125px] shrink-0 flex-col items-center gap-2 rounded-2xl border border-white/5 bg-white/5 p-3 text-center transition-all hover:border-white/20 hover:bg-white/10"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgSrc}
+                        alt={artist.name}
+                        className="h-14 w-14 rounded-full object-cover shadow-md border border-white/10"
+                      />
+                      <span className="text-xs font-semibold text-white/90 truncate w-full">
+                        {artist.name}
+                      </span>
+                      <span className="text-[10px] text-white/40 truncate w-full">
+                        {artist.role || "Elenco"}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
-            {/* CONTINUE WATCHING */}
-            <section className="mt-[38px] flex flex-col">
+            {/* SEÇÃO 4: CONTINUE WATCHING */}
+            <section className="mt-[36px] flex flex-col">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold tracking-wide text-white">Continue Watching</h2>
+                <div>
+                  <h2 className="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-[#e50914]" /> Continue Watching
+                  </h2>
+                  <p className="text-[11px] text-white/50">Retome a reprodução exatamente de onde parou</p>
+                </div>
                 <div className="flex items-center gap-2">
                   <button type="button" className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Previous watch item">
                     <ChevronLeft className="h-4 w-4" />
@@ -396,37 +649,86 @@ export function CinemaxDashboard({
                 </div>
               </div>
 
-              {/* Cards horizontal single row */}
-              <div className="mt-[18px] flex gap-4 overflow-x-auto no-scrollbar pb-1">
-                {continueWatching.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative flex w-[210px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:border-white/20 hover:bg-white/10"
-                  >
-                    <div className="relative h-[110px] w-full overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e50914] text-white shadow-lg">
-                          <Play className="h-4 w-4 fill-white" />
+              {/* Cards horizontal single row com Imagens Locais */}
+              <div className="mt-[16px] flex gap-4 overflow-x-auto no-scrollbar pb-1">
+                {activeContinue.map((item, idx) => {
+                  const fallbackWatchImgs = ["/OIP (4).webp", "/OIP (5).webp", "/OIP (6).webp"];
+                  const imgSrc = (item.imageUrl && !item.imageUrl.endsWith(".svg")) ? item.imageUrl : fallbackWatchImgs[idx % fallbackWatchImgs.length];
+                  return (
+                    <div
+                      key={item.id}
+                      className="group relative flex w-[220px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:border-white/20 hover:bg-white/10"
+                    >
+                      <div className="relative h-[115px] w-full overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imgSrc}
+                          alt={item.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e50914] text-white shadow-lg">
+                            <Play className="h-4 w-4 fill-white" />
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 inset-x-0 h-1 bg-white/20">
+                          <div className="h-full bg-[#e50914] w-[65%]" />
                         </div>
                       </div>
+                      <div className="flex flex-col p-3">
+                        <span className="text-xs font-semibold text-white truncate">{item.title}</span>
+                        <span className="text-[10px] text-white/50 truncate">{item.episode || item.progress}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col p-3">
-                      <span className="text-xs font-semibold text-white truncate">{item.title}</span>
-                      <span className="text-[10px] text-white/50">{item.progress}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
+
+            {/* SEÇÃO 5: EXTRA PIPOCAS & LOJA CINEMAX */}
+            <section className="mt-[36px] flex flex-col">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold tracking-wide text-white flex items-center gap-2">
+                    <Popcorn className="h-4 w-4 text-amber-400" /> Conveniência & Extras do Bar
+                  </h2>
+                  <p className="text-[11px] text-white/50">Compre pipocas, bebidas e snacks junto com o seu bilhete</p>
+                </div>
+                <Link href="/loja" className="text-xs font-medium text-[#e50914] hover:underline flex items-center gap-1">
+                  Ver Loja <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="mt-[16px] grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {activeProducts.map((prod, idx) => {
+                  const fallbackProductImgs = ["/OIP (8).webp", "/OIP (9).webp", "/cb99b8b3aac2684d9260778c107071fd.jpg"];
+                  const imgSrc = (prod.imageUrl && !prod.imageUrl.endsWith(".svg")) ? prod.imageUrl : fallbackProductImgs[idx % fallbackProductImgs.length];
+                  return (
+                    <Link
+                      key={prod.id}
+                      href="/loja"
+                      className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 p-3 transition-all hover:border-white/20 hover:bg-white/10"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgSrc}
+                        alt={prod.name}
+                        className="h-14 w-14 rounded-xl object-cover shrink-0 shadow"
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-semibold text-white truncate">{prod.name}</span>
+                        <span className="text-xs font-bold text-amber-400 mt-1">{prod.price}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+            </div>
+
           </main>
 
-          {/* SIDEBAR DIREITA */}
+          {/* SIDEBAR DIREITA com Imagens Locais */}
           <aside className="flex h-full min-h-0 w-full flex-col border-l border-white/10 bg-[#09090b]/80 p-[35px] overflow-y-auto">
             
             {/* SEARCH */}
@@ -446,24 +748,28 @@ export function CinemaxDashboard({
                 Popular Movies
               </h3>
               <div className="mt-4 flex flex-col gap-3">
-                {popularMovies.map((movie) => (
-                  <div key={movie.id} className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-white/5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={movie.posterUrl}
-                      alt={movie.title}
-                      className="h-[52px] w-[38px] rounded-lg object-cover shrink-0 shadow"
-                    />
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold text-white truncate">{movie.title}</span>
-                      <span className="text-[10px] text-white/50 truncate">{movie.genre}</span>
-                      <div className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-400">
-                        <Star className="h-3 w-3 fill-amber-400" />
-                        <span>{movie.rating}</span>
+                {activePopular.map((movie, idx) => {
+                  const fallbackPop = ["/OIP (7).webp", "/OIP (8).webp", "/OIP (9).webp"];
+                  const imgSrc = (movie.posterUrl && !movie.posterUrl.endsWith(".svg")) ? movie.posterUrl : fallbackPop[idx % fallbackPop.length];
+                  return (
+                    <div key={movie.id} className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-white/5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgSrc}
+                        alt={movie.title}
+                        className="h-[52px] w-[38px] rounded-lg object-cover shrink-0 shadow"
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-semibold text-white truncate">{movie.title}</span>
+                        <span className="text-[10px] text-white/50 truncate">{movie.genre}</span>
+                        <div className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-400">
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <span>{movie.rating}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* SEE MORE BUTTON */}
@@ -471,7 +777,7 @@ export function CinemaxDashboard({
                 href="/filmes?status=NOW_SHOWING"
                 className="mt-[18px] flex h-[34px] w-full items-center justify-center rounded-[8px] border border-white/10 bg-white/5 text-xs font-medium text-white/80 transition-all hover:bg-white/10 hover:text-white"
               >
-                See More
+                Ver Mais
               </Link>
             </div>
 
@@ -481,24 +787,28 @@ export function CinemaxDashboard({
                 Favorites
               </h3>
               <div className="mt-4 flex flex-col gap-3">
-                {favoriteMovies.map((movie) => (
-                  <div key={movie.id} className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-white/5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={movie.posterUrl}
-                      alt={movie.title}
-                      className="h-[52px] w-[38px] rounded-lg object-cover shrink-0 shadow"
-                    />
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold text-white truncate">{movie.title}</span>
-                      <span className="text-[10px] text-white/50 truncate">{movie.genre}</span>
-                      <div className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-400">
-                        <Star className="h-3 w-3 fill-amber-400" />
-                        <span>{movie.rating}</span>
+                {activeFavorites.map((movie, idx) => {
+                  const fallbackFav = ["/cb99b8b3aac2684d9260778c107071fd.jpg", "/0030a0e8216496997f7abebc1b9f8837.jpg", "/4d56548cd696aac3a0de41b63e15d535.jpg"];
+                  const imgSrc = (movie.posterUrl && !movie.posterUrl.endsWith(".svg")) ? movie.posterUrl : fallbackFav[idx % fallbackFav.length];
+                  return (
+                    <div key={movie.id} className="flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-white/5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imgSrc}
+                        alt={movie.title}
+                        className="h-[52px] w-[38px] rounded-lg object-cover shrink-0 shadow"
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-semibold text-white truncate">{movie.title}</span>
+                        <span className="text-[10px] text-white/50 truncate">{movie.genre}</span>
+                        <div className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-400">
+                          <Star className="h-3 w-3 fill-amber-400" />
+                          <span>{movie.rating}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* SEE MORE BUTTON */}
@@ -506,7 +816,7 @@ export function CinemaxDashboard({
                 href="/conta/lista"
                 className="mt-[18px] flex h-[34px] w-full items-center justify-center rounded-[8px] border border-white/10 bg-white/5 text-xs font-medium text-white/80 transition-all hover:bg-white/10 hover:text-white"
               >
-                See More
+                Ver Mais
               </Link>
             </div>
 
