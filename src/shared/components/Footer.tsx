@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/shared/components/Logo";
 import type { Dictionary } from "@/shared/lib/i18n";
 
 export function Footer({ dict }: { dict: Dictionary }) {
+  const path = usePathname();
+  if (path.startsWith("/entrar") || path.startsWith("/registar") || path.startsWith("/recuperar")) {
+    return null;
+  }
   const cols = [
     {
       title: "CINEMAX",

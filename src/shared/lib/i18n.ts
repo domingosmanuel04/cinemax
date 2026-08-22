@@ -256,6 +256,7 @@ const pt = {
     staff: "Equipa",
     emails: "Emails",
     settings: "Configurações",
+    superAdmin: "Super Admin",
   },
 };
 
@@ -514,6 +515,7 @@ const en: typeof pt = {
     staff: "Staff",
     emails: "Emails",
     settings: "Settings",
+    superAdmin: "Super Admin",
   },
 };
 
@@ -772,6 +774,7 @@ const fr: typeof pt = {
     staff: "Équipe",
     emails: "E-mails",
     settings: "Paramètres",
+    superAdmin: "Super Admin",
   },
 };
 

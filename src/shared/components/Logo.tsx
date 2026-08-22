@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { cn } from "@/shared/lib/utils";
 
-export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
+export function Logo({ className, imgClassName }: { className?: string; imgClassName?: string; compact?: boolean }) {
   return (
-    <Link href="/" className={cn("group inline-flex items-center gap-2", className)} aria-label="CINEMAX">
-      <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-md border border-cx-red/60 bg-cx-void shadow-[0_0_18px_rgb(229_9_20_/_0.45)]">
-        <span className="font-display text-[10px] tracking-[0.2em] text-white">CX</span>
-        <span className="absolute inset-x-0 bottom-0 h-0.5 bg-cx-red" />
-      </span>
-      {compact ? null : (
-        <span className="font-display text-lg tracking-[0.32em] text-white">
-          CINE<span className="text-cx-red">MAX</span>
-        </span>
-      )}
+    <Link
+      href="/"
+      className={cn("group inline-flex items-center transition-transform duration-300 hover:scale-105 shrink-0", className)}
+      aria-label="CINEMAX"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.png"
+        alt="CINEMAX"
+        className={cn("h-16 sm:h-20 md:h-24 w-auto max-w-[280px] object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.1)] shrink-0", imgClassName)}
+      />
     </Link>
   );
 }

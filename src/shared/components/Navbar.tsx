@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Bell, MapPin, Menu, Search, User, X } from "lucide-react";
+import { Bell, MapPin, Menu, Search, ShieldAlert, User, X } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
 import { LocaleSwitch } from "@/shared/components/LocaleSwitch";
 import { cn } from "@/shared/lib/utils";
@@ -28,18 +28,21 @@ const links = [
 export function Navbar({
   dict,
   userName,
+  role,
   locale,
   cinemaName,
   currency,
 }: {
   dict: Dictionary;
   userName?: string | null;
+  role?: string | null;
   locale: string;
   cinemaName?: string | null;
   currency?: string;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const isStaffUser = role && ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF", "FINANCE", "MARKETING", "CONTENT_MANAGER"].includes(role);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -66,6 +69,17 @@ export function Navbar({
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            {isStaffUser ? (
+              <Link
+                href="/admin/super-admin"
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-gradient-to-r from-amber-500/20 via-red-600/30 to-amber-600/20 px-3.5 py-1.5 text-xs font-bold text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-105 hover:border-amber-400 transition-all duration-300"
+                title="Entrar no Painel de Super Admin"
+              >
+                <ShieldAlert className="h-4 w-4 text-amber-400 animate-pulse" />
+                <span className="hidden sm:inline tracking-wider uppercase font-mono">PAINEL SUPER ADMIN</span>
+              </Link>
+            ) : null}
+
             <Link href="/pesquisa" className="grid h-10 w-10 place-items-center rounded-full text-white/80 hover:bg-white/10" aria-label={dict.nav.search}>
               <Search className="h-4 w-4" />
             </Link>
@@ -98,6 +112,16 @@ export function Navbar({
             </button>
           </div>
           <nav className="grid gap-2 px-6 py-4 text-lg">
+            {isStaffUser ? (
+              <Link
+                href="/admin/super-admin"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/10 p-3 text-amber-300 font-bold tracking-wider"
+              >
+                <ShieldAlert className="h-5 w-5 text-amber-400" />
+                PAINEL SUPER ADMIN
+              </Link>
+            ) : null}
             {links.map(([href, key]) => (
               <Link key={href + key} href={href} onClick={() => setOpen(false)} className="border-b border-white/5 py-2">
                 {dict.nav[key]}

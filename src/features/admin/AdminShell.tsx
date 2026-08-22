@@ -24,6 +24,7 @@ import {
   CreditCard,
   Megaphone,
   Shield,
+  ShieldAlert,
   ScanLine,
   Mail,
   Tv,
@@ -78,6 +79,7 @@ const GROUPS: { title: keyof Dictionary["admin"]; items: { href: string; label: 
   {
     title: "system",
     items: [
+      { href: "/admin/super-admin", label: "superAdmin", icon: ShieldAlert },
       { href: "/admin/streaming/licencas", label: "licenses", icon: Shield },
       { href: "/admin/inventario", label: "inventory", icon: Package },
       { href: "/admin/funcionarios", label: "staff", icon: Users },

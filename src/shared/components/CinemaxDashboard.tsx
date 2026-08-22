@@ -30,6 +30,7 @@ import {
   Flame,
   Award,
   Popcorn,
+  ShieldAlert,
 } from "lucide-react";
 import { Logo } from "@/shared/components/Logo";
 import { LocaleSwitch } from "@/shared/components/LocaleSwitch";
@@ -72,6 +73,7 @@ type ProductItem = {
 
 interface CinemaxDashboardProps {
   userName?: string | null;
+  role?: string | null;
   locale?: string;
   currency?: string;
   popularMovies?: MovieCardItem[];
@@ -247,6 +249,7 @@ const defaultProducts: ProductItem[] = [
 
 export function CinemaxDashboard({
   userName,
+  role,
   locale = "pt",
   currency = "AOA",
   popularMovies = defaultPopular,
@@ -259,6 +262,7 @@ export function CinemaxDashboard({
 }: CinemaxDashboardProps) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<"TV Series" | "Movies" | "Animes">("Movies");
+  const isStaffUser = role && ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF", "FINANCE", "MARKETING", "CONTENT_MANAGER"].includes(role);
 
   const activeReleases = releases && releases.length > 0 ? releases : defaultReleases;
   const activeSeries = series && series.length > 0 ? series : defaultSeries;
@@ -307,7 +311,7 @@ export function CinemaxDashboard({
           {/* SIDEBAR ESQUERDA */}
           <aside className="relative flex h-full min-h-0 w-full flex-col overflow-hidden border-r border-white/10 bg-[#09090b]/80">
             {/* LOGO */}
-            <div className="mt-[45px] ml-[45px] mb-4 shrink-0">
+            <div className="px-4 pt-5 pb-2 shrink-0 flex items-center justify-center">
               <Logo />
             </div>
 
@@ -405,6 +409,16 @@ export function CinemaxDashboard({
 
               {/* LADO DIREITO DA NAVEGAÇÃO */}
               <div className="flex items-center gap-3 shrink-0">
+                {isStaffUser ? (
+                  <Link
+                    href="/admin/super-admin"
+                    className="flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-gradient-to-r from-amber-500/20 via-red-600/30 to-amber-600/20 px-3.5 py-1.5 text-xs font-bold text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:scale-105 transition-all shrink-0"
+                    title="Ir para o Painel do Super Admin"
+                  >
+                    <ShieldAlert className="h-4 w-4 text-amber-400 animate-pulse" />
+                    <span className="hidden sm:inline uppercase font-mono">Super Admin</span>
+                  </Link>
+                ) : null}
                 <LocaleSwitch locale={locale} currency={currency} />
                 <Link
                   href={userName ? "/conta" : "/entrar"}

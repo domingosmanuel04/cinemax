@@ -101,6 +101,7 @@ export default async function HomePage() {
       />
       <CinemaxDashboard
         userName={session?.name}
+        role={session?.role}
         locale={locale}
         currency={currency}
         popularMovies={popularFormatted.length > 0 ? popularFormatted : undefined}
