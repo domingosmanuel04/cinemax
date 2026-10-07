@@ -18,21 +18,42 @@ export async function loginAction(
 ) {
   if (formData.get("otp")) {
     const otp = String(formData.get("otp") || "");
-    const next = String(formData.get("next") || "/conta");
+    const nextParam = String(formData.get("next") || "/");
     const user = await completeTwoFactorLogin(otp);
     if (!user) return { error: "Código 2FA inválido.", requires2fa: true };
-    redirect(next.startsWith("/") ? next : "/conta");
+    
+    let targetUrl = nextParam;
+    if (!nextParam || nextParam === "/" || nextParam === "/conta") {
+      if (user.role === "SUPER_ADMIN") targetUrl = "/admin/super-admin";
+      else if (["ADMIN", "MANAGER", "STAFF", "FINANCE", "MARKETING", "CONTENT_MANAGER"].includes(user.role)) targetUrl = "/admin";
+      else targetUrl = "/";
+    }
+    redirect(targetUrl.startsWith("/") ? targetUrl : "/");
   }
+
   const parsed = creds.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
-    next: formData.get("next") || "/conta",
+    next: formData.get("next") || "/",
   });
   if (!parsed.success) return { error: "Dados inválidos." };
   const user = await loginWithCredentials(parsed.data.email, parsed.data.password);
   if (!user) return { error: "Email ou palavra-passe incorrectos." };
   if ("requires2fa" in user && user.requires2fa) return { requires2fa: true };
-  redirect(parsed.data.next?.startsWith("/") ? parsed.data.next : "/conta");
+
+  let targetUrl = parsed.data.next || "/";
+  if ("role" in user) {
+    if (!parsed.data.next || parsed.data.next === "/" || parsed.data.next === "/conta") {
+      if (user.role === "SUPER_ADMIN") {
+        targetUrl = "/admin/super-admin";
+      } else if (["ADMIN", "MANAGER", "STAFF", "FINANCE", "MARKETING", "CONTENT_MANAGER"].includes(user.role)) {
+        targetUrl = "/admin";
+      } else {
+        targetUrl = "/"; // Direct redirect to public site page for customers
+      }
+    }
+  }
+  redirect(targetUrl.startsWith("/") ? targetUrl : "/");
 }
 
 export async function registerAction(_: { error?: string } | null, formData: FormData) {
@@ -58,7 +79,7 @@ export async function registerAction(_: { error?: string } | null, formData: For
     },
   });
   await createSession({ id: user.id, email: user.email, name: user.name, role: user.role, avatarUrl: user.avatarUrl });
-  redirect("/conta");
+  redirect("/");
 }
 
 export async function logoutAction() {

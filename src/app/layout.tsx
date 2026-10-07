@@ -28,8 +28,8 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettings().catch(() => ({ preloaderEnabled: "true" }));
   return (
-    <html lang="pt" className={`${inter.variable} ${cinzel.variable}`}>
-      <body className={`${inter.className} cinema-gradient pb-16 md:pb-0`}>
+    <html lang="pt" className={`${inter.variable} ${cinzel.variable}`} suppressHydrationWarning>
+      <body className={`${inter.className} cinema-gradient pb-16 md:pb-0`} suppressHydrationWarning>
         <AppChrome preloader={settings.preloaderEnabled !== "false"}>{children}</AppChrome>
       </body>
     </html>
